@@ -29,10 +29,11 @@ classdef cuvis_session_file < handle
             
         end
         
-        function measurement = get_measurement(sessObj,frameNo)
+        function measurement = get_measurement(sessObj,frameNo, type)
             
             mesuPtr = libpointer('int32Ptr',0);
-            [code,copy_handle]=calllib('cuvis','cuvis_session_file_get_mesu',sessObj.sdk_handle, frameNo-1, mesuPtr );
+            
+            [code,copy_handle]=calllib('cuvis','cuvis_session_file_get_mesu',sessObj.sdk_handle, frameNo-1, type, mesuPtr );
             clear mesuPtr ;
             cuvis_helper_chklasterr(code);
             
