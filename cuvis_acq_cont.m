@@ -5,6 +5,7 @@ classdef cuvis_acq_cont < handle
     end
     properties (Access = private)
         cleanup;
+        
     end
     methods (Access = private)
         
@@ -20,13 +21,24 @@ classdef cuvis_acq_cont < handle
             acqContObj.sdk_handle=-1;
             acqContObj.cleanup = onCleanup(@()delete(acqContObj));
             
+      
+            switch class(data)
+                case 'cuvis_calibration'
+                    acquContPtr = libpointer('int32Ptr',0);
+                    [code,acqContObj.sdk_handle]=calllib('cuvis','cuvis_acq_cont_create_from_calib', data.sdk_handle, acquContPtr );
+                    clear acquContPtr ;
+                    cuvis_helper_chklasterr(code);
+                
+                case 'cuvis_session_file'
+                    acquContPtr = libpointer('int32Ptr',0);
+                    [code,acqContObj.sdk_handle]=calllib('cuvis','cuvis_acq_cont_create_from_session_file', data.sdk_handle, acquContPtr );
+                    clear acquContPtr ;
+                    cuvis_helper_chklasterr(code);
+                otherwise
+                    
+                    error('cannot create acq_context from argument');
+            end
             
-            
-            acquContPtr = libpointer('int32Ptr',0);
-            
-            [code,acqContObj.sdk_handle]=calllib('cuvis','cuvis_acq_cont_create_from_calib', data.sdk_handle, acquContPtr );
-            clear acquContPtr ;
-            cuvis_helper_chklasterr(code);
             
             
             
