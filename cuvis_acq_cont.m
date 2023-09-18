@@ -24,15 +24,15 @@ classdef cuvis_acq_cont < handle
       
             switch class(data)
                 case 'cuvis_calibration'
-                    acquContPtr = libpointer('int32Ptr',0);
-                    [code,acqContObj.sdk_handle]=calllib('cuvis','cuvis_acq_cont_create_from_calib', data.sdk_handle, acquContPtr );
-                    clear acquContPtr ;
+                    acqContPtr = libpointer('int32Ptr',0);
+                    [code,acqContObj.sdk_handle]=calllib('cuvis','cuvis_acq_cont_create_from_calib', data.sdk_handle, acqContPtr );
+                    clear acqContPtr ;
                     cuvis_helper_chklasterr(code);
                 
                 case 'cuvis_session_file'
-                    acquContPtr = libpointer('int32Ptr',0);
-                    [code,acqContObj.sdk_handle]=calllib('cuvis','cuvis_acq_cont_create_from_session_file', data.sdk_handle, acquContPtr );
-                    clear acquContPtr ;
+                    acqContPtr = libpointer('int32Ptr',0);
+                    [code,acqContObj.sdk_handle]=calllib('cuvis','cuvis_acq_cont_create_from_session_file', data.sdk_handle,1, acqContPtr );
+                    clear acqContPtr ;
                     cuvis_helper_chklasterr(code);
                 otherwise
                     
@@ -412,7 +412,7 @@ classdef cuvis_acq_cont < handle
         function waitObj = set_continuous(acqContObj,value)
             waitHandlePtr = libpointer('int32Ptr',0);
             
-            [code, waitHandle]=calllib('cuvis','cuvis_acq_cont_continuous', acqContObj.sdk_handle, waitHandlePtr, value);
+            [code, waitHandle]=calllib('cuvis','cuvis_acq_cont_continuous_set_async', acqContObj.sdk_handle, waitHandlePtr, value);
             clear waitHandlePtr ;
             cuvis_helper_chklasterr(code);
             waitObj=@(time_ms) cuvis_helper_chkasync(calllib('cuvis','cuvis_async_call_get',waitHandle,time_ms));

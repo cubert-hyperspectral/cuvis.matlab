@@ -22,9 +22,11 @@ classdef cuvis_worker < handle
             
             addParameter(p,'worker_count',8,@isinteger);
             addParameter(p,'poll_interval',10,@isinteger);
-            addParameter(p,'keep_out_of_sequence',false,@keep_out_of_sequence);
-            addParameter(p,'worker_queue_size',100,@isinteger);
-            
+            addParameter(p,'keep_out_of_sequence',false,@islogical);
+            addParameter(p,'worker_queue_soft_limit',12,@isinteger);
+            addParameter(p,'worker_queue_hard_limit',20,@isinteger);
+            addParameter(p,'can_drop',true,@islogical);
+
             addParameter(p,'export_dir','.',@ischar);
             addParameter(p,'spectra_multiplier',1.0,validScalarPosNum);
             addParameter(p,'channel_selection','full',@ischar);
@@ -44,9 +46,9 @@ classdef cuvis_worker < handle
             cworker_settings.Value.worker_count = p.Results.worker_count;
             cworker_settings.Value.poll_interval = p.Results.poll_interval ;
             cworker_settings.Value.keep_out_of_sequence = p.Results.keep_out_of_sequence ;
-            cworker_settings.Value.worker_queue_size = p.Results.worker_queue_size ;
-            
-            
+            cworker_settings.Value.worker_queue_soft_limit = p.Results.worker_queue_soft_limit ;
+            cworker_settings.Value.worker_queue_hard_limit = p.Results.worker_queue_hard_limit ;
+            cworker_settings.Value.can_drop = p.Results.can_drop ;
             
             [code,workerObj.sdk_handle]=calllib('cuvis','cuvis_worker_create', workerObj.sdk_handle, cworker_settings  );
             calllib('cuvis','cuvis_worker_settings_free',cworker_settings);
@@ -110,12 +112,12 @@ classdef cuvis_worker < handle
         end
         
         
-        function [isok, mesu, view] = get_next_mesurement(workerObj)
+        function [isok, mesu, view] = get_next_mesurement(workerObj, timeout)
             
             
             mesuHandlePtr = libpointer('int32Ptr',0);
             viewHandlePtr = libpointer('int32Ptr',0);
-            [code, mesuHandle, viewHandle]=calllib('cuvis','cuvis_worker_get_next_result', workerObj.sdk_handle, mesuHandlePtr, viewHandlePtr);
+            [code, mesuHandle, viewHandle]=calllib('cuvis','cuvis_worker_get_next_result', workerObj.sdk_handle, mesuHandlePtr, viewHandlePtr, timeout);
             clear mesuHandlePtr;
             clear viewHandlePtr;
             
