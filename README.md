@@ -10,7 +10,7 @@ cuvis.matlab is the MATLAB wrapper for the Cuvis SDK written in C ([available he
 - **Support:** http://support.cubert-hyperspectral.com/
 
 This wrapper enables operating Cubert GmbH Hyperspectral Cameras, as well as, 
-analyzing data directly from the corporate data format(s) within python.
+analyzing data directly from the corporate data format(s) within MATLAB.
 This wrapper provides an object-oriented full representation of the basic C SDK 
 capabilities and MATLAB return variable formats.
 
