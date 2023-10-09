@@ -202,7 +202,7 @@ classdef cuvis_acq_cont < handle
             clear inttimePtr;
             cuvis_helper_chklasterr(code);
         end
-        
+   
         function waitObj = set_auto_exp(acqContObj,value)
             waitHandlePtr = libpointer('int32Ptr',0);
             
@@ -220,6 +220,27 @@ classdef cuvis_acq_cont < handle
             cuvis_helper_chklasterr(code);
         end
         
+
+       function waitObj = set_auto_exp_comp(acqContObj,value)
+            waitHandlePtr = libpointer('int32Ptr',0);
+            
+            [code, waitHandle]=calllib('cuvis','cuvis_acq_cont_auto_exp_comp_set_async', acqContObj.sdk_handle, waitHandlePtr, value);
+            clear waitHandlePtr ;
+            cuvis_helper_chklasterr(code);
+            waitObj=@(time_ms) cuvis_helper_chkasync(calllib('cuvis','cuvis_async_call_get',waitHandle,time_ms));
+        end
+        
+
+        function value  = get_auto_exp_comp(acqContObj)
+            inttimePtr = libpointer('doublePtr',0);
+            [code, value]=calllib('cuvis','cuvis_acq_cont_auto_exp_comp_get', acqContObj.sdk_handle, inttimePtr);
+            
+            clear inttimePtr;
+            cuvis_helper_chklasterr(code);
+        end
+        
+        
+
         function waitObj = set_fps(acqContObj,value)
             waitHandlePtr = libpointer('int32Ptr',0);
             
@@ -228,6 +249,7 @@ classdef cuvis_acq_cont < handle
             cuvis_helper_chklasterr(code);
             waitObj=@(time_ms) cuvis_helper_chkasync(calllib('cuvis','cuvis_async_call_get',waitHandle,time_ms));
         end
+        
         
         function value  = get_fps(acqContObj)
             fpsPtr = libpointer('doublePtr',0);
@@ -426,6 +448,10 @@ classdef cuvis_acq_cont < handle
             end
             
         end
+
+    
+        
+       
         
     end
 end
