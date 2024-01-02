@@ -43,7 +43,17 @@ function cuvis_init(settings_path)
         end
 
 
-        loadlibrary('cuvis');
+        files = dir(fullfile(getenv('CUVIS'),'../','sdk','cuvis_c','cuvis.*'));
+        for k=1:length(files)
+            if ~exist([pwd,'/',files(k).name],'file')
+              copyfile(fullfile(getenv('CUVIS'),'../','sdk','cuvis_c',files(k).name), pwd);  
+            end
+
+        end
+
+        if ~libisloaded('cuvis')
+            loadlibrary('cuvis.dll','cuvis.h');
+        end
         calllib('cuvis','cuvis_set_log_level',3);
         if ~(exist('settings_path','var'))
             calllib('cuvis','cuvis_init',fullfile(getenv('CUVIS'),'../','settings'));
