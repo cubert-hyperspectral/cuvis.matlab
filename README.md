@@ -26,7 +26,13 @@ First, you need to install the Cuvis C SDK from [here](https://cloud.cubert-gmbh
 
 ### Import
 
-:warning: NEED TO DO
+In your MATLAB skript, you need to include 2 lines:
+
+1.) add the path to your cuvis_matlab location, e.g. `addpath('C:\Program Files\Cuvis\sdk\cuvis_matlab');`.
+
+2.) initiate the cuvis_init.m funtionality with a settings directory, e.g. `cuvis_init('user/settings');`.
+
+This will make the cuvis functionalities available, e.g.: `calib = cuvis_calibration(INIT_DIR);`, `proc = cuvis_proc_cont(calib);`, or `acq = cuvis_acq_cont(calib);`.
 
 
 ## How to ...
