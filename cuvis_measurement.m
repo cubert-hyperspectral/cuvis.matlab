@@ -184,7 +184,8 @@ classdef cuvis_measurement < handle
                         contentdata.temperature = sinfo.temperature;
                         contentdata.gain = sinfo.gain;
                         contentdata.readout_time = cuvis_helper_mktime(sinfo.readout_time);
-                        
+                        contentdata.width = sinfo.width;
+						contentdata.height = sinfo.height;
                     otherwise
                         contentdata.key=key;
                         contentdata.type='unkown';
