@@ -15,12 +15,12 @@ function cuvis_init(settings_path)
         if ~libisloaded('cuvis')
             loadlibrary(fullfile(getenv('CUVIS'),'../','sdk','cuvis_c','cuvis.dll'),fullfile(getenv('CUVIS'),'../','sdk','cuvis_c','cuvis.h'));
         end
-        calllib('cuvis','cuvis_set_log_level',3);
         if ~(exist('settings_path','var'))
-            calllib('cuvis','cuvis_init',fullfile(getenv('CUVIS'),'../','settings'));
+            calllib('cuvis','cuvis_init',fullfile(getenv('CUVIS'),'../','settings'),4);
         else
-            calllib('cuvis','cuvis_init',settings_path);
+            calllib('cuvis','cuvis_init',settings_path,4);
         end
+        calllib('cuvis','cuvis_set_log_level',3);
         
         cuvis_is_initialized = 1;
     end
