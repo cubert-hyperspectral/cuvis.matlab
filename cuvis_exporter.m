@@ -17,8 +17,6 @@ classdef cuvis_exporter < handle
             exporterObj.gargs=[];
             exporterObj.cleanup = onCleanup(@()delete(exporterObj));
             
-            
-            
             p = inputParser;
             p.KeepUnmatched=true;
             validScalarPosNum = @(x) isnumeric(x) && isscalar(x) && (x > 0);
@@ -33,24 +31,13 @@ classdef cuvis_exporter < handle
             addParameter(p,'add_fullscale_pan',false,@islogical);
             addParameter(p,'permissive',false,@islogical);
             
-            
-            
             parse(p,varargin{:});
             
-            
-            
             exporterObj.gargs=calllib('cuvis','cuvis_export_general_settings_allocate');
-            
-            
-            
             exporterObj.gargs.Value.spectra_multiplier=p.Results.spectra_multiplier;
-            
             exporterObj.gargs.Value.pan_scale=p.Results.pan_scale;
-
             exporterObj.gargs.Value.add_pan = p.Results.add_pan;
-
             exporterObj.gargs.Value.add_fullscale_pan = p.Results.add_fullscale_pan;
-            
             exporterObj.gargs.Value.permissive = p.Results.permissive;
             
             switch p.Results.pan_sharpening_interpolation_type
@@ -66,7 +53,6 @@ classdef cuvis_exporter < handle
                     error('pan_sharpening_interpolation_type not supported');
             end
             
-            
             switch p.Results.pan_sharpening_algorithm
                 case 'Noop'
                     exporterObj.gargs.Value.pan_algorithm = 0;
@@ -76,41 +62,30 @@ classdef cuvis_exporter < handle
                     error('pan_sharpening_algorithm not supported');
             end
             
-            
             exporterObj.gargs.Value.export_dir(:)  = 0;
             if length(p.Results.export_dir) > length(exporterObj.gargs.Value.export_dir) -1
                 error('parameter exceeds max. length');
             end
             exporterObj.gargs.Value.export_dir(1:length(p.Results.export_dir)) = p.Results.export_dir;
             
-            
             exporterObj.gargs.Value.channel_selection(:)=0;
             if length(p.Results.channel_selection) > length(exporterObj.gargs.Value.channel_selection)-1
                 error('parameter exceeds max. length');
             end
             exporterObj.gargs.Value.channel_selection(1:length(p.Results.channel_selection)) = p.Results.channel_selection;
-            
-            
-            
-            
         end
         
-        
-        function  apply(exporterObj, mesu)
-            
-            
+        function apply(exporterObj, mesu)
             code = calllib('cuvis','cuvis_exporter_apply',exporterObj.sdk_handle, mesu.sdk_handle);
-            
-            
             cuvis_helper_chklasterr(code)
-            
-            
         end
         
-        
+        function flush(exporterObj)
+            code = calllib('cuvis','cuvis_exporter_flush',exporterObj.sdk_handle);
+            cuvis_helper_chklasterr(code)
+        end
         
         function delete(exporterObj)
-            
             if ~isempty(exporterObj.gargs)
                 calllib('cuvis','cuvis_export_general_settings_free',exporterObj.gargs);
                 clear gargs;
@@ -119,8 +94,7 @@ classdef cuvis_exporter < handle
             if exporterObj.sdk_handle>0
                 calllib('cuvis','cuvis_exporter_free',exporterObj.sdk_handle);
             end
-            
-            
         end
+
     end
 end

@@ -27,6 +27,7 @@ classdef cuvis_viewer < handle
             addParameter(p,'pan_scale',0,@isnumeric);
             addParameter(p,'pan_sharpening_interpolation_type','NearestNeighbor',@ischar);
             addParameter(p,'pan_sharpening_algorithm','Noop',@ischar);
+            addParameter(p,'pre_pan_sharpen_cube',false,@islogical);
             addParameter(p,'complete',false,@islogical);
             addParameter(p,'userplugin',@ischar);
             
@@ -41,6 +42,8 @@ classdef cuvis_viewer < handle
             
             
             cargs.Value.pan_scale=p.Results.pan_scale;
+            
+            cargs.Value.pre_pan_sharpen_cube = p.Results.pre_pan_sharpen_cube;
             
             cargs.Value.complete = p.Results.complete;
             
