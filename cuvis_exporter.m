@@ -27,6 +27,7 @@ classdef cuvis_exporter < handle
             addParameter(p,'pan_scale',0,@isnumeric);
             addParameter(p,'pan_sharpening_interpolation_type','NearestNeighbor',@ischar);
             addParameter(p,'pan_sharpening_algorithm','Noop',@ischar);
+            addParameter(p,'pre_pan_sharpen_cube',false,@islogical);
             addParameter(p,'add_pan',false,@islogical);
             addParameter(p,'add_fullscale_pan',false,@islogical);
             addParameter(p,'permissive',false,@islogical);
@@ -36,6 +37,7 @@ classdef cuvis_exporter < handle
             exporterObj.gargs=calllib('cuvis','cuvis_export_general_settings_allocate');
             exporterObj.gargs.Value.spectra_multiplier=p.Results.spectra_multiplier;
             exporterObj.gargs.Value.pan_scale=p.Results.pan_scale;
+            exporterObj.gargs.Value.pre_pan_sharpen_cube = p.Results.pre_pan_sharpen_cube;
             exporterObj.gargs.Value.add_pan = p.Results.add_pan;
             exporterObj.gargs.Value.add_fullscale_pan = p.Results.add_fullscale_pan;
             exporterObj.gargs.Value.permissive = p.Results.permissive;
