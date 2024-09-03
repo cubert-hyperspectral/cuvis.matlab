@@ -186,6 +186,8 @@ classdef cuvis_measurement < handle
                         contentdata.readout_time = cuvis_helper_mktime(sinfo.readout_time);
                         contentdata.width = sinfo.width;
 						contentdata.height = sinfo.height;
+                        contentdata.pixel_format = sinfo.pixel_format
+                        contentdata.binning = sinfo.binning
                     otherwise
                         contentdata.key=key;
                         contentdata.type='unkown';
