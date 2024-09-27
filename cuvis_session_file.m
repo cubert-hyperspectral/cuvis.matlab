@@ -41,6 +41,32 @@ classdef cuvis_session_file < handle
             
         end
         
+        function value = get_thumbnail(sessObj)
+            imbufptr = calllib('cuvis','cuvis_imbuffer_allocate');
+            [code , image] =calllib('cuvis','cuvis_session_file_get_thumbnail',sessObj.sdk_handle, imbufptr);
+            calllib('cuvis','cuvis_imbuffer_free',imbufptr);
+
+            cuvis_helper_chklasterr(code);
+
+            len = image.width * image.height * image.channels;
+            if (len~=0)
+                
+                switch image.format
+                    case 'imbuffer_format_uint8'
+                        setdatatype(image.raw,'uint8Ptr',len);
+                    case 'imbuffer_format_uint16'
+                        setdatatype(image.raw,'uint16Ptr',len);
+                    case 'imbuffer_format_uint32'
+                        setdatatype(image.raw,'uint32Ptr',len);
+                    case 'imbuffer_format_float'
+                        setdatatype(image.raw,'singlePtr',len);
+                end
+                value = permute(reshape(image.raw.Value,[image.channels image.width image.height]),[3,2,1]);
+            else
+                value = [];
+            end
+        end
+        
         function measurement = get_measurement_non_dropped(sessObj,frameNo)
             
             mesuPtr = libpointer('int32Ptr',0);

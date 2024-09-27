@@ -12,11 +12,7 @@ classdef cuvis_acq_cont < handle
     end
     methods
         function acqContObj = cuvis_acq_cont(data)
-            
-            
-            
-            
-            
+         
             cuvis_helper_chklib
             acqContObj.sdk_handle=-1;
             acqContObj.cleanup = onCleanup(@()delete(acqContObj));
@@ -287,6 +283,39 @@ classdef cuvis_acq_cont < handle
             
         end
         
+        function waitObj = set_pixel_format(acqContObj,id,value)
+            waitHandlePtr = libpointer('int32Ptr',0);
+            
+            [code, waitHandle]=calllib('cuvis','cuvis_comp_pixel_format_set_async', acqContObj.sdk_handle, id -1, waitHandlePtr, value);
+            clear waitHandlePtr ;
+            cuvis_helper_chklasterr(code);
+            waitObj=@(time_ms) cuvis_helper_chkasync(calllib('cuvis','cuvis_async_call_get',waitHandle,time_ms));
+        end
+        
+        function value  = get_pixel_format(acqContObj,id)
+            valueStr= libpointer('cstring', repmat(' ',1,len));                       
+            [code, value]=calllib('cuvis','cuvis_comp_pixel_format_get', acqContObj.sdk_handle, id -1, valueStr );
+            clear valueStr;
+            
+            cuvis_helper_chklasterr(code);
+        end
+        
+        
+        function value  = get_available_pixel_formats(acqContObj,id)
+            
+            dataCntPtr = libpointer('int32Ptr',0);
+            [code,dataCnt]=calllib('cuvis','cuvis_comp_available_pixel_format_count_get',acqContObj.sdk_handle,id -1, dataCntPtr);
+            clear dataCntPtr;
+            cuvis_helper_chklasterr(code);
+            
+            for k=0:dataCnt-1
+                pixStr= libpointer('cstring', repmat(' ',1,256));
+                [code,pixel_format]=calllib('cuvis','cuvis_comp_available_pixel_format_get',acqContObj.sdk_handle,id -1, k, pixStr);    
+                clear pixStr;
+                cuvis_helper_chklasterr(code);
+                value{k+1} = pixel_format;
+            end            
+        end
         
         
         function waitObj = set_gain(acqContObj,id,value)
@@ -307,7 +336,7 @@ classdef cuvis_acq_cont < handle
         end
         
         function value  = get_temperature(acqContObj,id)
-            tempPtr = libpointer('intPtr',0);
+            tempPtr = libpointer('doublePtr',0);
             [code, value]=calllib('cuvis','cuvis_comp_temperature_get', acqContObj.sdk_handle, id -1, tempPtr  );
             
             clear tempPtr;

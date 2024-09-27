@@ -25,3 +25,4 @@ function cuvis_init(settings_path)
         cuvis_is_initialized = 1;
     end
 end
+

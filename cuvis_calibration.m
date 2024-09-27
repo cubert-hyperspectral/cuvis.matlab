@@ -29,6 +29,14 @@ classdef cuvis_calibration < handle
             
         end
         
+         function value  = get_info(calibObj)
+            ciPtr = libpointer('cuvis_calibration_info_allocate',0);
+            [code, value]=calllib('cuvis','cuvis_calib_get_info', calibObj.sdk_handle, ciPtr );
+            calllib('cuvis','cuvis_calibration_info_free',ciPtr  );
+            clear ciPtr  ;
+            cuvis_helper_chklasterr(code);
+        end
+        
         function capabilities = get_capabilities(calibObj, mode)
             if strcmp(mode, 'Software')
                 op_mode = 1;
