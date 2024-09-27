@@ -29,6 +29,7 @@ classdef cuvis_exporter_cube < cuvis_exporter
             addParameter(p,'soft_limit',20,validScalarPosNum);
             addParameter(p,'hard_limit',100,validScalarPosNum);
             addParameter(p,'max_buftime',10000,validScalarPosNum);
+            addParameter(p,'full_export',false,@islogical);
             
             parse(p,varargin{:});
             
@@ -42,6 +43,7 @@ classdef cuvis_exporter_cube < cuvis_exporter
             cargs.Value.allow_drop = p.Results.allow_drop;
             cargs.Value.allow_session_file = p.Results.allow_session_file;
             cargs.Value.allow_info_file = p.Results.allow_info_file;
+            cargs.Value.full_export = p.Results.full_export;
             
              if strcmp(p.Results.operation_mode, 'Software')
                 cargs.Value.operation_mode = 1;
