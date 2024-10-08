@@ -12,7 +12,7 @@ classdef cuvis_measurement < handle
         averages;
         sequence_no;
         session_no;
-        sesesion_name;
+        session_name;
         processing_mode;
         measurement_flags;
         flags;
@@ -56,7 +56,7 @@ classdef cuvis_measurement < handle
             mesuObj.serial_number = deblank(char(mesu_data.serial_number));
             mesuObj.assembly = deblank(char(mesu_data.assembly));
             
-            mesuObj.sesesion_name = deblank(char(mesu_data.session_info_name));
+            mesuObj.session_name = deblank(char(mesu_data.session_info_name));
             mesuObj.sequence_no = mesu_data.session_info_sequence_no;
             mesuObj.session_no = mesu_data.session_info_session_no;
             
