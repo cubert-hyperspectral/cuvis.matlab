@@ -20,13 +20,15 @@ classdef cuvis_worker < handle
             p.KeepUnmatched=true;
             validScalarPosNum = @(x) isnumeric(x) && isscalar(x) && (x > 0);
             
-            addParameter(p,'worker_count',8,@isinteger);
-            addParameter(p,'poll_interval',10,@isinteger);
-            addParameter(p,'keep_out_of_sequence',false,@islogical);
-            addParameter(p,'worker_queue_soft_limit',12,@isinteger);
-            addParameter(p,'worker_queue_hard_limit',20,@isinteger);
-            addParameter(p,'can_drop',true,@islogical);
+            addParameter(p,'input_queue_size',10,@isinteger);
+            addParameter(p,'mandatory_queue_size',4,@isinteger);
+            addParameter(p,'supplementary_queue_size',4,@isinteger);
+            addParameter(p,'output_queue_size',10,@isinteger);
+            addParameter(p,'can_skip_measurements',false,@islogical);
+            addParameter(p,'can_skip_supplementary_steps',true,@islogical);
+            addParameter(p,'can_drop_results',true,@islogical);
 
+            
             addParameter(p,'export_dir','.',@ischar);
             addParameter(p,'spectra_multiplier',1.0,validScalarPosNum);
             addParameter(p,'channel_selection','full',@ischar);
@@ -43,12 +45,16 @@ classdef cuvis_worker < handle
             
             
             cworker_settings = calllib('cuvis','cuvis_worker_settings_allocate');
-            cworker_settings.Value.worker_count = p.Results.worker_count;
-            cworker_settings.Value.poll_interval = p.Results.poll_interval ;
-            cworker_settings.Value.keep_out_of_sequence = p.Results.keep_out_of_sequence ;
-            cworker_settings.Value.worker_queue_soft_limit = p.Results.worker_queue_soft_limit ;
-            cworker_settings.Value.worker_queue_hard_limit = p.Results.worker_queue_hard_limit ;
-            cworker_settings.Value.can_drop = p.Results.can_drop ;
+            
+            
+            cworker_settings.Value.input_queue_size = p.Results.input_queue_size ;
+            cworker_settings.Value.mandatory_queue_size = p.Results.mandatory_queue_size ;
+            cworker_settings.Value.supplementary_queue_size = p.Results.supplementary_queue_size ;
+            cworker_settings.Value.output_queue_size = p.Results.output_queue_size ;
+            cworker_settings.Value.can_skip_supplementary_steps = p.Results.can_skip_supplementary_steps ;
+            cworker_settings.Value.can_skip_supplementary_steps = p.Results.can_skip_supplementary_steps ;
+            cworker_settings.Value.can_drop_results = p.Results.can_drop_results ;
+        
             
             [code,workerObj.sdk_handle]=calllib('cuvis','cuvis_worker_create', workerObj.sdk_handle, cworker_settings  );
             calllib('cuvis','cuvis_worker_settings_free',cworker_settings);
@@ -61,34 +67,127 @@ classdef cuvis_worker < handle
             
         end
         
-        
-        
-        function set_queue_limit(acqContObj,value)
-            [code]=calllib('cuvis','cuvis_worker_set_queue_limit', acqContObj.sdk_handle, value);
-            cuvis_helper_chklasterr(code);
-        end
-        
-        function value  = get_queue_limit(acqContObj)
-            qPtr = libpointer('int32Ptr',0);
-            [code, value]=calllib('cuvis','cuvis_worker_get_queue_limit', acqContObj.sdk_handle, qPtr  );
+    
+        function value  = cuvis_worker_get_input_queue_limit(workerObj)
+            qPtr = libpointer('uint64Ptr',0);
+            [code, value]=calllib('cuvis','cuvis_worker_get_input_queue_limit', workerObj.sdk_handle, qPtr  );
             
             clear qPtr ;
             cuvis_helper_chklasterr(code);
         end
         
-        function value  = get_queue_used(acqContObj)
-            qPtr = libpointer('int32Ptr',0);
-            [code, value]=calllib('cuvis','cuvis_worker_get_queue_used', acqContObj.sdk_handle, qPtr  );
+        function value  = cuvis_worker_get_mandatory_queue_limit(workerObj)
+            qPtr = libpointer('uint64Ptr',0);
+            [code, value]=calllib('cuvis','cuvis_worker_get_mandatory_queue_limit', workerObj.sdk_handle, qPtr  );
             
             clear qPtr ;
             cuvis_helper_chklasterr(code);
         end
         
+        function value  = cuvis_worker_get_supplementary_queue_limit(workerObj)
+            qPtr = libpointer('uint64Ptr',0);
+            [code, value]=calllib('cuvis','cuvis_worker_get_mandatory_queue_limit', workerObj.sdk_handle, qPtr  );
+            
+            clear qPtr ;
+            cuvis_helper_chklasterr(code);
+        end
+        
+        function value  = cuvis_worker_get_output_queue_limit(workerObj)
+            qPtr = libpointer('uint64Ptr',0);
+            [code, value]=calllib('cuvis','cuvis_worker_get_output_queue_limit', workerObj.sdk_handle, qPtr  );
+            
+            clear qPtr ;
+            cuvis_helper_chklasterr(code);
+        end
+        
+             
+        function value  = cuvis_worker_get_queue_used(workerObj)
+            qPtr = libpointer('uint64Ptr',0);
+            [code, value]=calllib('cuvis','cuvis_worker_get_queue_used', workerObj.sdk_handle, qPtr  );
+            
+            clear qPtr ;
+            cuvis_helper_chklasterr(code);
+        end
+        
+              
+        function value  = cuvis_worker_get_can_drop_results(workerObj)
+            qPtr = libpointer('int32Ptr',0);
+            [code, value]=calllib('cuvis','cuvis_worker_get_can_drop_results', workerObj.sdk_handle, qPtr  );
+            
+            clear qPtr ;
+            cuvis_helper_chklasterr(code);
+        end
+        
+        function value  = cuvis_worker_get_can_skip_measurements(workerObj)
+            qPtr = libpointer('int32Ptr',0);
+            [code, value]=calllib('cuvis','cuvis_worker_get_can_skip_measurements', workerObj.sdk_handle, qPtr  );
+            
+            clear qPtr ;
+            cuvis_helper_chklasterr(code);
+        end
+            
+        function value  = cuvis_worker_get_can_skip_supplementary(workerObj)
+            qPtr = libpointer('int32Ptr',0);
+            [code, value]=calllib('cuvis','cuvis_worker_get_can_skip_supplementary', workerObj.sdk_handle, qPtr  );
+            
+            clear qPtr ;
+            cuvis_helper_chklasterr(code);
+        end
+        
+              
+        function value  = cuvis_worker_is_processing_mandatory(workerObj)
+            qPtr = libpointer('int32Ptr',0);
+            [code, value]=calllib('cuvis','cuvis_worker_is_processing_mandatory', workerObj.sdk_handle, qPtr  );
+            
+            clear qPtr ;
+            cuvis_helper_chklasterr(code);
+        end
+        
+        function value  = cuvis_worker_get_threads_busy(workerObj)
+            qPtr = libpointer('int32Ptr',0);
+            [code, value]=calllib('cuvis','cuvis_worker_get_threads_busy', workerObj.sdk_handle, qPtr  );
+            
+            clear qPtr ;
+            cuvis_helper_chklasterr(code);
+        end
+        
+        function value  = cuvis_worker_is_processing(workerObj)
+            qPtr = libpointer('int32Ptr',0);
+            [code, value]=calllib('cuvis','cuvis_worker_is_processing', workerObj.sdk_handle, qPtr  );
+            
+            clear qPtr ;
+            cuvis_helper_chklasterr(code);
+        end
+        
+        
+        function value  = cuvis_worker_get_state(workerObj)
+            wsPtr = libpointer('cuvis_worker_state_allocate',0);
+            [code, value]=calllib('cuvis','cuvis_worker_get_state', workerObj.sdk_handle, wsPtr);
+            calllib('cuvis','cuvis_worker_state_free',wsPtr );
+            clear wsPtr ;
+            cuvis_helper_chklasterr(code);
+        end
+        
+        function cuvis_worker_start(workerObj)
+            [code]=calllib('cuvis','cuvis_worker_start', workerObj.sdk_handle);
+            cuvis_helper_chklasterr(code);
+        end
+        
+        function cuvis_worker_stop(workerObj)
+            [code]=calllib('cuvis','cuvis_worker_stop', workerObj.sdk_handle);
+            cuvis_helper_chklasterr(code);
+        end
+        
+        function cuvis_worker_drop_all_queued(workerObj)
+            [code]=calllib('cuvis','cuvis_worker_drop_all_queued', workerObj.sdk_handle);
+            cuvis_helper_chklasterr(code);
+        end
         
         function set_acq_cont(workerObj,acqCont)
             [code]=calllib('cuvis','cuvis_worker_set_acq_cont', workerObj.sdk_handle, acqCont.sdk_handle);
             cuvis_helper_chklasterr(code);
         end
+        
         function set_proc_cont(workerObj,procCont)
             [code]=calllib('cuvis','cuvis_worker_set_proc_cont', workerObj.sdk_handle, procCont.sdk_handle);
             cuvis_helper_chklasterr(code);

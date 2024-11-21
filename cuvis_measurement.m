@@ -12,11 +12,12 @@ classdef cuvis_measurement < handle
         averages;
         sequence_no;
         session_no;
-        sesesion_name;
+        session_name;
         processing_mode;
         measurement_flags;
         flags;
         capabilites;
+        frame_id;
         
         data;
         
@@ -55,7 +56,7 @@ classdef cuvis_measurement < handle
             mesuObj.serial_number = deblank(char(mesu_data.serial_number));
             mesuObj.assembly = deblank(char(mesu_data.assembly));
             
-            mesuObj.sesesion_name = deblank(char(mesu_data.session_info_name));
+            mesuObj.session_name = deblank(char(mesu_data.session_info_name));
             mesuObj.sequence_no = mesu_data.session_info_sequence_no;
             mesuObj.session_no = mesu_data.session_info_session_no;
             
@@ -64,6 +65,8 @@ classdef cuvis_measurement < handle
             mesuObj.factory_calibration = cuvis_helper_mktime(mesu_data.factory_calibration);
             mesuObj.integration_time = mesu_data.integration_time;
             mesuObj.averages = mesu_data.averages;
+            
+            mesuObj.frame_id = mesu_data.measurement_frame_id;
             
             
              capaPtr = libpointer('int32Ptr',0);
@@ -163,8 +166,13 @@ classdef cuvis_measurement < handle
                         
                     case 'data_type_string' % string
                         
-                        valueStr= libpointer('cstring', repmat(' ',1,265));
-                        [code,~,value]=calllib('cuvis','cuvis_measurement_get_data_string',mesuObj.sdk_handle,key,valueStr);
+                        lenPtr = libpointer('uint64Ptr',0);
+                        [code,~,len]=calllib('cuvis','cuvis_measurement_get_data_string_length',mesuObj.sdk_handle,key,lenPtr);
+                        clear lenPtr;
+                        cuvis_helper_chklasterr(code);
+                        
+                        valueStr= libpointer('cstring', repmat(' ',1,len));
+                        [code,~,value]=calllib('cuvis','cuvis_measurement_get_data_string',mesuObj.sdk_handle,key,len,valueStr);
                         clear valueStr;
                         cuvis_helper_chklasterr(code);
                         
@@ -188,6 +196,7 @@ classdef cuvis_measurement < handle
 						contentdata.height = sinfo.height;
                         contentdata.pixel_format = sinfo.pixel_format
                         contentdata.binning = sinfo.binning
+                        contentdata.raw_frame_id = sinfo.raw_frame_id;
                     otherwise
                         contentdata.key=key;
                         contentdata.type='unkown';
