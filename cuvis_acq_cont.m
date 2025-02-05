@@ -1,27 +1,24 @@
 classdef cuvis_acq_cont < handle
+
     properties
         sdk_handle;
         components;
     end
+
     properties (Access = private)
         cleanup;
-        
     end
+
     methods (Access = private)
-        
     end
+
     methods
+
         function acqContObj = cuvis_acq_cont(data)
-            
-            
-            
-            
-            
             cuvis_helper_chklib
             acqContObj.sdk_handle=-1;
             acqContObj.cleanup = onCleanup(@()delete(acqContObj));
             
-      
             switch class(data)
                 case 'cuvis_calibration'
                     acqContPtr = libpointer('int32Ptr',0);
@@ -34,14 +31,10 @@ classdef cuvis_acq_cont < handle
                     [code,acqContObj.sdk_handle]=calllib('cuvis','cuvis_acq_cont_create_from_session_file', data.sdk_handle,1, acqContPtr );
                     clear acqContPtr ;
                     cuvis_helper_chklasterr(code);
+                
                 otherwise
-                    
                     error('cannot create acq_context from argument');
             end
-            
-            
-            
-            
             
             countptr = libpointer('int32Ptr',0);
             [code, compcount] = calllib('cuvis','cuvis_acq_cont_get_component_count', acqContObj.sdk_handle, countptr);
@@ -49,7 +42,6 @@ classdef cuvis_acq_cont < handle
             cuvis_helper_chklasterr(code);
             
             for k=0:compcount-1
-                
                 comInfoPtr = calllib('cuvis','cuvis_cuvis_component_info_allocate');
                 [code,compInfo]=calllib('cuvis','cuvis_acq_cont_get_component_info',acqContObj.sdk_handle, k, comInfoPtr);
                 calllib('cuvis','cuvis_cuvis_component_info_free',comInfoPtr);
@@ -58,13 +50,11 @@ classdef cuvis_acq_cont < handle
                 
                 acqContObj.components{k+1}.type = compInfo.type;
                 acqContObj.components{k+1}.id = k;
-                acqContObj.components{k+1}.displayname =  deblank(char(compInfo.displayname));
-                acqContObj.components{k+1}.sensorinfo =  deblank(char(compInfo.sensorinfo));
-                acqContObj.components{k+1}.userfield =  deblank(char(compInfo.userfield));
-                acqContObj.components{k+1}.pixelformat =  deblank(char(compInfo.pixelformat));
-                
+                acqContObj.components{k+1}.displayname = deblank(char(compInfo.displayname));
+                acqContObj.components{k+1}.sensorinfo = deblank(char(compInfo.sensorinfo));
+                acqContObj.components{k+1}.userfield = deblank(char(compInfo.userfield));
+                acqContObj.components{k+1}.pixelformat = deblank(char(compInfo.pixelformat));
             end
-            
         end
         
         function hasNext = has_next_measurement(acqContObj)
@@ -73,13 +63,17 @@ classdef cuvis_acq_cont < handle
             clear hasNextPtr ;
             cuvis_helper_chklasterr(code);
             hasNext = (nextint ~= 0);
-            
+        end
+
+        function isReady = get_is_ready(acqContObj)
+            isReadyPtr = libpointer('int32Ptr',0);
+            [code,nextint]=calllib('cuvis','cuvis_acq_cont_ready_get', acqContObj.sdk_handle, isReadyPtr);
+            clear isReadyPtr ;
+            cuvis_helper_chklasterr(code);
+            isReady = (nextint ~= 0);
         end
         
-        
         function [isok, mesu] = get_next_mesurement(acqContObj, time_ms)
-            
-            
             mesuHandlePtr = libpointer('int32Ptr',0);
             [code, mesuHandle]=calllib('cuvis','cuvis_acq_cont_get_next_measurement', acqContObj.sdk_handle, mesuHandlePtr, time_ms);
             clear mesuHandlePtr;
@@ -95,10 +89,6 @@ classdef cuvis_acq_cont < handle
             end
         end
         
-        
-        
-        
-        
         function waitObj = capture(acqContObj)
             waitHandlePtr = libpointer('int32Ptr',0);
             
@@ -107,8 +97,6 @@ classdef cuvis_acq_cont < handle
             cuvis_helper_chklasterr(code);
             waitObj=@(time_ms) cuvis_helper_get_capture_async(waitHandle,time_ms);
         end
-        
-        
         
         function waitObj = set_operation_mode(acqContObj,value)
             if strcmp(value, 'Software')
@@ -127,7 +115,6 @@ classdef cuvis_acq_cont < handle
             cuvis_helper_chklasterr(code);
             waitObj=@(time_ms) cuvis_helper_chkasync(calllib('cuvis','cuvis_async_call_get',waitHandle,time_ms));
         end
-        
         
         function value  = get_operation_mode(acqContObj)
             opPtr = libpointer('cuvis_operation_mode_t',0);
@@ -162,8 +149,6 @@ classdef cuvis_acq_cont < handle
             cuvis_helper_chklasterr(code);
         end
         
-        
-        
         function set_queue_size(acqContObj,value)
             [code]=calllib('cuvis','cuvis_acq_cont_queue_size_set', acqContObj.sdk_handle, value);
             cuvis_helper_chklasterr(code);
@@ -184,7 +169,6 @@ classdef cuvis_acq_cont < handle
             clear qPtr ;
             cuvis_helper_chklasterr(code);
         end
-        
         
         function waitObj = set_integration_time(acqContObj,value)
             waitHandlePtr = libpointer('int32Ptr',0);
@@ -220,7 +204,6 @@ classdef cuvis_acq_cont < handle
             cuvis_helper_chklasterr(code);
         end
         
-
        function waitObj = set_auto_exp_comp(acqContObj,value)
             waitHandlePtr = libpointer('int32Ptr',0);
             
@@ -230,7 +213,6 @@ classdef cuvis_acq_cont < handle
             waitObj=@(time_ms) cuvis_helper_chkasync(calllib('cuvis','cuvis_async_call_get',waitHandle,time_ms));
         end
         
-
         function value  = get_auto_exp_comp(acqContObj)
             inttimePtr = libpointer('doublePtr',0);
             [code, value]=calllib('cuvis','cuvis_acq_cont_auto_exp_comp_get', acqContObj.sdk_handle, inttimePtr);
@@ -239,8 +221,6 @@ classdef cuvis_acq_cont < handle
             cuvis_helper_chklasterr(code);
         end
         
-        
-
         function waitObj = set_fps(acqContObj,value)
             waitHandlePtr = libpointer('int32Ptr',0);
             
@@ -250,7 +230,6 @@ classdef cuvis_acq_cont < handle
             waitObj=@(time_ms) cuvis_helper_chkasync(calllib('cuvis','cuvis_async_call_get',waitHandle,time_ms));
         end
         
-        
         function value  = get_fps(acqContObj)
             fpsPtr = libpointer('doublePtr',0);
             [code, value]=calllib('cuvis','cuvis_acq_cont_fps_get', acqContObj.sdk_handle, fpsPtr);
@@ -258,7 +237,6 @@ classdef cuvis_acq_cont < handle
             clear fpsPtr;
             cuvis_helper_chklasterr(code);
         end
-        
         
         function waitObj = set_binning(acqContObj,value)
             waitHandlePtr = libpointer('int32Ptr',0);
@@ -277,17 +255,13 @@ classdef cuvis_acq_cont < handle
             cuvis_helper_chklasterr(code);
         end
         
-        
         function value = get_state(acqContObj)
             cstate=libpointer('cuvis_hardware_state_t',1);
             [code,value]=calllib('cuvis','cuvis_acq_cont_get_state', acqContObj.sdk_handle,cstate);
             clear cstate;
             
             cuvis_helper_chklasterr(code);
-            
         end
-        
-        
         
         function waitObj = set_gain(acqContObj,id,value)
             waitHandlePtr = libpointer('int32Ptr',0);
@@ -328,7 +302,6 @@ classdef cuvis_acq_cont < handle
             
             clear bwPtr;
             cuvis_helper_chklasterr(code);
-            
         end
         
         function value  = get_comp_driver_queue_used(acqContObj,id)
@@ -337,9 +310,7 @@ classdef cuvis_acq_cont < handle
             
             clear bwPtr;
             cuvis_helper_chklasterr(code);
-            
         end
-        
         
         function value  = get_comp_hardware_queue_size(acqContObj,id)
             bwPtr = libpointer('int32Ptr',0);
@@ -347,7 +318,6 @@ classdef cuvis_acq_cont < handle
             
             clear bwPtr;
             cuvis_helper_chklasterr(code);
-            
         end
         
         function value  = get_comp_hardware_queue_used(acqContObj,id)
@@ -356,7 +326,6 @@ classdef cuvis_acq_cont < handle
             
             clear bwPtr;
             cuvis_helper_chklasterr(code);
-            
         end
         
         function waitObj = set_integration_time_factor(acqContObj,id,value)
@@ -386,9 +355,7 @@ classdef cuvis_acq_cont < handle
             cuvis_helper_chklasterr(code);
         end
         
-        
         function [name, session_no, sequence_no] = get_session_info(acqContObj)
-            
             sessPtr = calllib('cuvis','cuvis_session_info_allocate');
             [code,sess]=calllib('cuvis','cuvis_acq_cont_get_session_info',acqContObj.sdk_handle, sessPtr );
             calllib('cuvis','cuvis_session_info_free',sessPtr );
@@ -398,7 +365,6 @@ classdef cuvis_acq_cont < handle
             name = deblank(char(sess.name));
             session_no = sess.session_no;
             sequence_no= sess.sequence_no;
-            
         end
         
         function set_session_info(acqContObj,name, session_no, sequence_no)
@@ -409,10 +375,6 @@ classdef cuvis_acq_cont < handle
                 sequence_no = 0;
             end
             sessPtr = calllib('cuvis','cuvis_session_info_allocate');
-            
-            
-            
-            
             sessPtr.Value.name(:) = 0;
             
             if length(name) > length(sessPtr.Value.name) -1
@@ -420,10 +382,8 @@ classdef cuvis_acq_cont < handle
             end
             
             sessPtr.Value.name(1:length(name)) = name;
-            
             sessPtr.Value.session_no = session_no;
             sessPtr.Value.sequence_no= sequence_no;
-            
             
             [code]=calllib('cuvis','cuvis_acq_cont_set_session_info',acqContObj.sdk_handle, sessPtr );
             calllib('cuvis','cuvis_session_info_free',sessPtr );
@@ -441,17 +401,10 @@ classdef cuvis_acq_cont < handle
         end
         
         function delete(acqContObj)
-            
             if (acqContObj.sdk_handle >=0)
                 calllib('cuvis','cuvis_acq_cont_free',acqContObj.sdk_handle);
-                
             end
-            
         end
 
-    
-        
-       
-        
     end
 end
