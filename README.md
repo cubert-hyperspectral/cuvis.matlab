@@ -1,5 +1,13 @@
 ![image](https://raw.githubusercontent.com/cubert-hyperspectral/cuvis.sdk/main/branding/logo/banner.png)
 
+
+>**WARNING**\
+>This repository is no longer actively maintained.
+>We no longer offer support or bug fixes for this project.
+>Use at your own discretion.\
+>Last release: 01.10.2024 \
+>Last supported Cuvis version: 3.3.0
+
 # cuvis.matlab
 
 cuvis.matlab is the MATLAB wrapper for the Cuvis SDK written in C ([available here](https://github.com/cubert-hyperspectral/cuvis.sdk)).
